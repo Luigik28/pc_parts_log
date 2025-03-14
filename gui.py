@@ -73,11 +73,17 @@ class Gui:
                 entry.bind("<Button-1>", lambda event: entry.event_generate("<Down>"))
                 entry.config(state="readonly")
             elif label == "Scontato":
-                entry = ttk.Checkbutton(popup)
+                var = tk.BooleanVar()
+                if data is not None:
+                    var.set(data.scontato)
+                else:
+                    var.set(False)
+                entry = ttk.Checkbutton(popup, variable=var, onvalue=True, offvalue=False)
                 entry.state(['!alternate'])
                 entry.state(['!selected'])
                 if data is not None and data.scontato:
                     entry.state(['selected']) 
+                entry.var = var
             else:
                 entry = ttk.Entry(popup)
                 entry.insert(0, values[i] if data is not None else "")
@@ -92,7 +98,7 @@ class Gui:
         if isinstance(_entry, ttk.Combobox) or isinstance(_entry, ttk.Entry):
             return _entry.get()
         elif isinstance(_entry, ttk.Checkbutton):
-            return 'Si' if _entry.instate(['selected']) else 'No'
+            return 'Si' if _entry.var.get() else 'No'
         return None
 
     def save_row(self, _entries: list[ttk.Entry], event: str, popup: tk.Toplevel, tree: ttk.Treeview):
@@ -156,7 +162,7 @@ class Gui:
     def modify_row(self, headers: list[str], tree: ttk.Treeview):
         selected_item = tree.selection()[0]
         data = tree.item(selected_item)["values"]
-        self.show_popup("modify_row", headers, Part(data, Part.UI))
+        self.show_popup("modify_row", headers, tree, Part(data, p.UI))
 
     def initialize(self):
         self.db.create_db()
