@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkcalendar import DateEntry
 from database import Database
 import Part as p
 from Part import Part
@@ -84,6 +85,10 @@ class Gui:
                 if data is not None and data.scontato:
                     entry.state(['selected']) 
                 entry.var = var
+            elif label == "Data Prezzo":
+                entry = DateEntry(popup, date_pattern='dd-mm-yyyy')
+                if data is not None:
+                    entry.set_date(values[i])
             else:
                 entry = ttk.Entry(popup)
                 entry.insert(0, values[i] if data is not None else "")
@@ -99,6 +104,8 @@ class Gui:
             return _entry.get()
         elif isinstance(_entry, ttk.Checkbutton):
             return 'Si' if _entry.var.get() else 'No'
+        elif isinstance(_entry, DateEntry):
+            return _entry.get_date().strftime('%Y-%m-%d') 
         return None
 
     def save_row(self, _entries: list[ttk.Entry], event: str, popup: tk.Toplevel, tree: ttk.Treeview):
@@ -165,6 +172,7 @@ class Gui:
         self.show_popup("modify_row", headers, tree, Part(data, p.UI))
 
     def initialize(self):
+        #self.db.drop_table("parts")
         self.db.create_db()
 
         # Creazione del notebook (contenitore per le tab)
